@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Administración de Pacientes</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2980b9;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        header h1 {
+            text-align: center;
+            font-size: 2.5rem;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .tab-btn {
+            padding: 10px 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            color: var(--dark-color);
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab-btn.active {
+            border-bottom: 3px solid var(--primary-color);
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        textarea.form-control {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
+        .btn-success {
+            background-color: var(--success-color);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: var(--light-color);
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+        
+        .badge-primary {
+            background-color: rgba(52, 152, 219, 0.2);
+            color: var(--primary-color);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .close-modal {
+            float: right;
+            cursor: pointer;
+            font-size: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Sistema de Administración de Pacientes</h1>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="patients">Pacientes</button>
+            <button class="tab-btn" data-tab="sessions">Sesiones</button>
+        </div>
+        
+        <!-- Pacientes Tab -->
+        <div id="patients" class="tab-content active">
+            <div class="card">
+                <h2>Registrar Nuevo Paciente</h2>
+                <form id="patientForm">
+                    <div class="form-group">
+                        <label for="firstName">Nombres</label>
+                        <input type="text" id="firstName" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="lastName">Apellidos</label>
+                        <input type="text" id="lastName" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="birthDate">Fecha de Nacimiento</label>
+                        <input type="date" id="birthDate" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="diagnosis">Diagnóstico</label>
+                        <textarea id="diagnosis" class="form-control"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="maritalStatus">Estado Civil</label>
+                        <select id="maritalStatus" class="form-control">
+                            <option value="Soltero">Soltero</option>
+                            <option value="Casado">Casado</option>
+                            <option value="Divorciado">Divorciado</option>
+                            <option value="Viudo">Viudo</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="hasChildren"> ¿Tiene hijos?
+                        </label>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="sport">Deporte que práctica</label>
+                        <input type="text" id="sport" class="form-control">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="hobbies">Hobbies</label>
+                        <textarea id="hobbies" class="form-control"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="paymentMethod">Forma de Pago</label>
+                        <select id="paymentMethod" class="form-control">
+                            <option value="Efectivo">Efectivo</option>
+                            <option value="Tarjeta">Tarjeta</option>
+                            <option value="Transferencia">Transferencia</option>
+                            <option value="Seguro">Seguro</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success">Guardar Paciente</button>
+                </form>
+            </div>
+            
+            <div class="card">
+                <h2>Listado de Pacientes</h2>
+                <div class="form-group">
+                    <input type="text" id="searchPatient" class="form-control" placeholder="Buscar paciente...">
+                </div>
+                
+                <table id="patientsTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Edad</th>
+                            <th>Diagnóstico</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="patientsTableBody">
+                        <!-- Los pacientes se cargarán aquí con JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Sesiones Tab -->
+        <div id="sessions" class="tab-content">
+            <div class="card">
+                <h2>Programar Nueva Sesión</h2>
+                <form id="sessionForm">
+                    <div class="form-group">
+                        <label for="sessionPatient">Paciente</label>
+                        <select id="sessionPatient" class="form-control" required>
+                            <option value="">Seleccionar paciente...</option>
+                            <!-- Las opciones se llenarán con JavaScript -->
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="sessionDate">Fecha y Hora</label>
+                        <input type="datetime-local" id="sessionDate" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="sessionNotes">Notas</label>
+                        <textarea id="sessionNotes" class="form-control"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Tratamientos</label>
+                        <div>
+                            <label><input type="checkbox" id="magneto"> Magneto</label>
+                            <label><input type="checkbox" id="laser"> Láser</label>
+                            <label><input type="checkbox" id="massage"> Masaje</label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="otherTreatment">Otro tratamiento</label>
+                        <input type="text" id="otherTreatment" class="form-control">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success">Programar Sesión</button>
+                </form>
+            </div>
+            
+            <div class="card">
+                <h2>Próximas Sesiones</h2>
+                <table id="sessionsTable">
+                    <thead>
+                        <tr>
+                            <th>Paciente</th>
+                            <th>Fecha</th>
+                            <th>Tratamientos</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sessionsTableBody">
+                        <!-- Las sesiones se cargarán aquí con JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal para ver detalles -->
+    <div id="patientModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 id="modalTitle">Detalles del Paciente</h2>
+            <div id="modalContent">
+                <!-- Los detalles se cargarán aquí con JavaScript -->
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Clases para manejar los datos
+        class Patient {
+            constructor(id, firstName, lastName, birthDate, diagnosis, maritalStatus, hasChildren, sport, hobbies, paymentMethod) {
+                this.id = id;
+                this.firstName = firstName;
+                this.lastName = lastName;
+                this.birthDate = birthDate;
+                this.diagnosis = diagnosis;
+                this.maritalStatus = maritalStatus;
+                this.hasChildren = hasChildren;
+                this.sport = sport;
+                this.hobbies = hobbies;
+                this.paymentMethod = paymentMethod;
+            }
+            
+            getFullName() {
+                return `${this.firstName} ${this.lastName}`;
+            }
+            
+            getAge() {
+                const birthDate = new Date(this.birthDate);
+                const today = new Date();
+                let age = today.getFullYear() - birthDate.getFullYear();
+                const monthDiff = today.getMonth() - birthDate.getMonth();
+                
+                if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                    age--;
+                }
+                
+                return age;
+            }
+        }
+        
+        class Session {
+            constructor(id, patientId, date, notes, magneto, laser, massage, otherTreatment) {
+                this.id = id;
+                this.patientId = patientId;
+                this.date = date;
+                this.notes = notes;
+                this.magneto = magneto;
+                this.laser = laser;
+                this.massage = massage;
+                this.otherTreatment = otherTreatment;
+            }
+            
+            getFormattedDate() {
+                const dateObj = new Date(this.date);
+                return dateObj.toLocaleString('es-ES');
+            }
+            
+            getTreatments() {
+                const treatments = [];
+                if (this.magneto) treatments.push("Magneto");
+                if (this.laser) treatments.push("Láser");
+                if (this.massage) treatments.push("Masaje");
+                if (this.otherTreatment) treatments.push(this.otherTreatment);
+                return treatments;
+            }
+        }
+        
+        // Clase para manejar el almacenamiento
+        class StorageManager {
+            static getPatients() {
+                const patients = localStorage.getItem('patients');
+                return patients ? JSON.parse(patients) : [];
+            }
+            
+            static savePatients(patients) {
+                localStorage.setItem('patients', JSON.stringify(patients));
+            }
+            
+            static getSessions() {
+                const sessions = localStorage.getItem('sessions');
+                return sessions ? JSON.parse(sessions) : [];
+            }
+            
+            static saveSessions(sessions) {
+                localStorage.setItem('sessions', JSON.stringify(sessions));
+            }
+            
+            static getNextPatientId() {
+                const patients = this.getPatients();
+                return patients.length > 0 ? Math.max(...patients.map(p => p.id)) + 1 : 1;
+            }
+            
+            static getNextSessionId() {
+                const sessions = this.getSessions();
+                return sessions.length > 0 ? Math.max(...sessions.map(s => s.id)) + 1 : 1;
+            }
+        }
+        
+        // Clase para manejar la UI
+        class UIManager {
+            static initTabs() {
+                const tabBtns = document.querySelectorAll('.tab-btn');
+                const tabContents = document.querySelectorAll('.tab-content');
+                
+                tabBtns.forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const tabId = btn.getAttribute('data-tab');
+                        
+                        tabBtns.forEach(btn => btn.classList.remove('active'));
+                        tabContents.forEach(content => content.classList.remove('active'));
+                        
+                        btn.classList.add('active');
+                        document.getElementById(tabId).classList.add('active');
+                        
+                        if (tabId === 'sessions') {
+                            this.loadPatientsForSessions();
+                            this.loadSessions();
+                        }
+                    });
+                });
+            }
+            
+            static loadPatients() {
+                const patients = StorageManager.getPatients();
+                const tableBody = document.getElementById('patientsTableBody');
+                tableBody.innerHTML = '';
+                
+                if (patients.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No hay pacientes registrados</td></tr>';
+                    return;
+                }
+                
+                patients.forEach(patient => {
+                    const tr = document.createElement('tr');
+                    const patientObj = new Patient(
+                        patient.id,
+                        patient.firstName,
+                        patient.lastName,
+                        patient.birthDate,
+                        patient.diagnosis,
+                        patient.maritalStatus,
+                        patient.hasChildren,
+                        patient.sport,
+                        patient.hobbies,
+                        patient.paymentMethod
+                    );
+                    
+                    tr.innerHTML = `
+                        <td>${patientObj.id}</td>
+                        <td>${patientObj.getFullName()}</td>
+                        <td>${patientObj.getAge()}</td>
+                        <td>${patientObj.diagnosis ? patientObj.diagnosis.substring(0, 30) + (patientObj.diagnosis.length > 30 ? '...' : '') : ''}</td>
+                        <td>
+                            <button class="btn-view" data-id="${patientObj.id}">Ver</button>
+                            <button class="btn-delete" data-id="${patientObj.id}">Eliminar</button>
+                        </td>
+                    `;
+                    
+                    tableBody.appendChild(tr);
+                });
+                
+                // Agregar event listeners a los botones
+                document.querySelectorAll('.btn-view').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const id = parseInt(e.target.getAttribute('data-id'));
+                        this.showPatientDetails(id);
+                    });
+                });
+                
+                document.querySelectorAll('.btn-delete').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const id = parseInt(e.target.getAttribute('data-id'));
+                        this.deletePatient(id);
+                    });
+                });
+            }
+            
+            static loadPatientsForSessions() {
+                const patients = StorageManager.getPatients();
+                const select = document.getElementById('sessionPatient');
+                select.innerHTML = '<option value="">Seleccionar paciente...</option>';
+                
+                patients.forEach(patient => {
+                    const option = document.createElement('option');
+                    option.value = patient.id;
+                    option.textContent = `${patient.firstName} ${patient.lastName}`;
+                    select.appendChild(option);
+                });
+            }
+            
+            static loadSessions() {
+                const sessions = StorageManager.getSessions();
+                const patients = StorageManager.getPatients();
+                const tableBody = document.getElementById('sessionsTableBody');
+                tableBody.innerHTML = '';
+                
+                if (sessions.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="4" style="text-align: center;">No hay sesiones programadas</td></tr>';
+                    return;
+                }
+                
+                // Ordenar sesiones por fecha (más recientes primero)
+                sessions.sort((a, b) => new Date(b.date) - new Date(a.date));
+                
+                sessions.forEach(session => {
+                    const sessionObj = new Session(
+                        session.id,
+                        session.patientId,
+                        session.date,
+                        session.notes,
+                        session.magneto,
+                        session.laser,
+                        session.massage,
+                        session.otherTreatment
+                    );
+                    
+                    const patient = patients.find(p => p.id === sessionObj.patientId);
+                    const patientName = patient ? `${patient.firstName} ${patient.lastName}` : 'Paciente no encontrado';
+                    
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${patientName}</td>
+                        <td>${sessionObj.getFormattedDate()}</td>
+                        <td>${sessionObj.getTreatments().join(', ')}</td>
+                        <td>
+                            <button class="btn-delete-session" data-id="${sessionObj.id}">Eliminar</button>
+                        </td>
+                    `;
+                    
+                    tableBody.appendChild(tr);
+                });
+                
+                // Agregar event listeners a los botones de eliminar
+                document.querySelectorAll('.btn-delete-session').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const id = parseInt(e.target.getAttribute('data-id'));
+                        this.deleteSession(id);
+                    });
+                });
+            }
+            
+            static showPatientDetails(id) {
+                const patients = StorageManager.getPatients();
+                const patientData = patients.find(p => p.id === id);
+                
+                if (!patientData) {
+                    alert('Paciente no encontrado');
+                    return;
+                }
+                
+                const patient = new Patient(
+                    patientData.id,
+                    patientData.firstName,
+                    patientData.lastName,
+                    patientData.birthDate,
+                    patientData.diagnosis,
+                    patientData.maritalStatus,
+                    patientData.hasChildren,
+                    patientData.sport,
+                    patientData.hobbies,
+                    patientData.paymentMethod
+                );
+                
+                document.getElementById('modalTitle').textContent = `Detalles de ${patient.getFullName()}`;
+                
+                const content = `
+                    <p><strong>Nombre completo:</strong> ${patient.getFullName()}</p>
+                    <p><strong>Edad:</strong> ${patient.getAge()} años</p>
+                    <p><strong>Fecha de nacimiento:</strong> ${patient.birthDate}</p>
+                    <p><strong>Diagnóstico:</strong> ${patient.diagnosis || 'No especificado'}</p>
+                    <p><strong>Estado civil:</strong> ${patient.maritalStatus}</p>
+                    <p><strong>Hijos:</strong> ${patient.hasChildren ? 'Sí' : 'No'}</p>
+                    <p><strong>Deporte:</strong> ${patient.sport || 'No especificado'}</p>
+                    <p><strong>Hobbies:</strong> ${patient.hobbies || 'No especificados'}</p>
+                    <p><strong>Forma de pago:</strong> ${patient.paymentMethod}</p>
+                `;
+                
+                document.getElementById('modalContent').innerHTML = content;
+                document.getElementById('patientModal').style.display = 'flex';
+            }
+            
+            static deletePatient(id) {
+                if (!confirm('¿Está seguro que desea eliminar este paciente y todas sus sesiones?')) {
+                    return;
+                }
+                
+                // Eliminar el paciente
+                let patients = StorageManager.getPatients();
+                patients = patients.filter(p => p.id !== id);
+                StorageManager.savePatients(patients);
+                
+                // Eliminar las sesiones asociadas
+                let sessions = StorageManager.getSessions();
+                sessions = sessions.filter(s => s.patientId !== id);
+                StorageManager.saveSessions(sessions);
+                
+                this.loadPatients();
+                if (document.getElementById('sessions').classList.contains('active')) {
+                    this.loadPatientsForSessions();
+                    this.loadSessions();
+                }
+                
+                alert('Paciente eliminado correctamente');
+            }
+            
+            static deleteSession(id) {
+                if (!confirm('¿Está seguro que desea eliminar esta sesión?')) {
+                    return;
+                }
+                
+                let sessions = StorageManager.getSessions();
+                sessions = sessions.filter(s => s.id !== id);
+                StorageManager.saveSessions(sessions);
+                
+                this.loadSessions();
+                alert('Sesión eliminada correctamente');
+            }
+            
+            static setupSearch() {
+                document.getElementById('searchPatient').addEventListener('input', function(e) {
+                    const searchTerm = e.target.value.toLowerCase();
+                    const rows = document.querySelectorAll('#patientsTableBody tr');
+                    
+                    rows.forEach(row => {
+                        const name = row.cells[1].textContent.toLowerCase();
+                        row.style.display = name.includes(searchTerm) ? '' : 'none';
+                    });
+                });
+            }
+            
+            static setupModal() {
+                const modal = document.getElementById('patientModal');
+                const closeBtn = document.querySelector('.close-modal');
+                
+                closeBtn.addEventListener('click', () => {
+                    modal.style.display = 'none';
+                });
+                
+                window.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.style.display = 'none';
+                    }
+                });
+            }
+            
+            static setupForms() {
+                // Formulario de paciente
+                document.getElementById('patientForm').addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const id = StorageManager.getNextPatientId();
+                    const firstName = document.getElementById('firstName').value;
+                    const lastName = document.getElementById('lastName').value;
+                    const birthDate = document.getElementById('birthDate').value;
+                    const diagnosis = document.getElementById('diagnosis').value;
+                    const maritalStatus = document.getElementById('maritalStatus').value;
+                    const hasChildren = document.getElementById('hasChildren').checked;
+                    const sport = document.getElementById('sport').value;
+                    const hobbies = document.getElementById('hobbies').value;
+                    const paymentMethod = document.getElementById('paymentMethod').value;
+                    
+                    const newPatient = new Patient(
+                        id,
+                        firstName,
+                        lastName,
+                        birthDate,
+                        diagnosis,
+                        maritalStatus,
+                        hasChildren,
+                        sport,
+                        hobbies,
+                        paymentMethod
+                    );
+                    
+                    const patients = StorageManager.getPatients();
+                    patients.push(newPatient);
+                    StorageManager.savePatients(patients);
+                    
+                    this.reset();
+                    UIManager.loadPatients();
+                    alert('Paciente registrado correctamente');
+                });
+                
+                // Formulario de sesión
+                document.getElementById('sessionForm').addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const patientId = parseInt(document.getElementById('sessionPatient').value);
+                    if (!patientId) {
+                        alert('Seleccione un paciente');
+                        return;
+                    }
+                    
+                    const id = StorageManager.getNextSessionId();
+                    const date = document.getElementById('sessionDate').value;
+                    const notes = document.getElementById('sessionNotes').value;
+                    const magneto = document.getElementById('magneto').checked;
+                    const laser = document.getElementById('laser').checked;
+                    const massage = document.getElementById('massage').checked;
+                    const otherTreatment = document.getElementById('otherTreatment').value;
+                    
+                    const newSession = new Session(
+                        id,
+                        patientId,
+                        date,
+                        notes,
+                        magneto,
+                        laser,
+                        massage,
+                        otherTreatment
+                    );
+                    
+                    const sessions = StorageManager.getSessions();
+                    sessions.push(newSession);
+                    StorageManager.saveSessions(sessions);
+                    
+                    this.reset();
+                    UIManager.loadSessions();
+                    alert('Sesión programada correctamente');
+                });
+            }
+        }
+        
+        // Inicialización de la aplicación
+        document.addEventListener('DOMContentLoaded', function() {
+            UIManager.initTabs();
+            UIManager.loadPatients();
+            UIManager.setupSearch();
+            UIManager.setupModal();
+            UIManager.setupForms();
+            
+            // Cargar datos de ejemplo si no hay datos
+            if (StorageManager.getPatients().length === 0) {
+                const examplePatient = new Patient(
+                    1,
+                    'Juan',
+                    'Pérez',
+                    '1985-05-15',
+                    'Dolor lumbar crónico',
+                    'Casado',
+                    true,
+                    'Natación',
+                    'Leer, música',
+                    'Efectivo'
+                );
+                
+                StorageManager.savePatients([examplePatient]);
+                UIManager.loadPatients();
+            }
+        });
+    </script>
+</body>
+</html>
