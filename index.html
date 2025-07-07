@@ -4,160 +4,241 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Administración de Pacientes</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #3498db;
-            --secondary-color: #2980b9;
-            --accent-color: #e74c3c;
-            --light-color: #ecf0f1;
-            --dark-color: #2c3e50;
-            --success-color: #2ecc71;
-            --warning-color: #f39c12;
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --accent: #4895ef;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --rounded: 12px;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
         }
-        
+
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
         }
-        
+
         body {
-            background-color: #f5f5f5;
-            color: #333;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--dark);
             line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
         }
-        
+
+        /* Modo oscuro */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --light: #2b2d42;
+                --dark: #f8f9fa;
+            }
+            
+            body {
+                background: linear-gradient(135deg, #121212 0%, #1e1e1e 100%);
+            }
+        }
+
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
+            background: white;
+            border-radius: var(--rounded);
+            box-shadow: var(--shadow);
+            overflow: hidden;
         }
-        
+
         header {
-            background-color: var(--dark-color);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             color: white;
             padding: 20px 0;
-            margin-bottom: 30px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        
-        header h1 {
             text-align: center;
-            font-size: 2.5rem;
+            margin-bottom: 30px;
         }
-        
+
+        header h1 {
+            font-size: 2rem;
+            font-weight: 600;
+        }
+
         .tabs {
             display: flex;
-            margin-bottom: 20px;
-            border-bottom: 1px solid #ddd;
+            background: white;
+            border-bottom: 1px solid #eee;
+            padding: 0 20px;
         }
-        
+
         .tab-btn {
-            padding: 10px 20px;
+            padding: 15px 25px;
             background: none;
             border: none;
             cursor: pointer;
             font-size: 1rem;
-            color: var(--dark-color);
-            transition: all 0.3s ease;
+            color: var(--dark);
+            transition: var(--transition);
             border-bottom: 3px solid transparent;
+            font-weight: 500;
+            position: relative;
         }
-        
+
         .tab-btn.active {
-            border-bottom: 3px solid var(--primary-color);
-            color: var(--primary-color);
-            font-weight: bold;
+            color: var(--primary);
+            border-bottom-color: var(--primary);
         }
-        
+
+        .tab-btn:focus {
+            outline: none;
+            background-color: rgba(67, 97, 238, 0.1);
+        }
+
         .tab-content {
             display: none;
             animation: fadeIn 0.5s ease;
+            padding: 20px;
         }
-        
+
         .tab-content.active {
             display: block;
         }
-        
+
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        
+
         .card {
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            background: white;
+            border-radius: var(--rounded);
+            box-shadow: var(--shadow);
             padding: 20px;
             margin-bottom: 20px;
+            transition: var(--transition);
         }
-        
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
-        
+
         .form-group label {
             display: block;
-            margin-bottom: 5px;
-            font-weight: 600;
-            color: var(--dark-color);
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark);
         }
-        
+
         .form-control {
             width: 100%;
-            padding: 10px;
+            padding: 12px 15px;
             border: 1px solid #ddd;
-            border-radius: 4px;
+            border-radius: var(--rounded);
             font-size: 1rem;
+            transition: var(--transition);
         }
-        
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+            outline: none;
+        }
+
         textarea.form-control {
-            min-height: 100px;
+            min-height: 120px;
             resize: vertical;
         }
-        
+
         .btn {
-            padding: 10px 20px;
-            background-color: var(--primary-color);
-            color: white;
+            padding: 12px 24px;
             border: none;
-            border-radius: 4px;
+            border-radius: var(--rounded);
             cursor: pointer;
             font-size: 1rem;
+            font-weight: 500;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
-        
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            box-shadow: var(--shadow);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+        }
+
         .btn-success {
-            background-color: var(--success-color);
+            background-color: var(--success);
+            color: white;
         }
-        
+
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
         }
-        
+
         th, td {
-            padding: 12px 15px;
+            padding: 15px;
             text-align: left;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 1px solid #eee;
         }
-        
+
         th {
-            background-color: var(--light-color);
+            background-color: var(--light);
+            font-weight: 600;
         }
-        
+
+        tr:hover {
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+
         .badge {
             display: inline-block;
-            padding: 3px 8px;
+            padding: 4px 10px;
             border-radius: 20px;
             font-size: 0.8rem;
+            font-weight: 500;
         }
-        
+
         .badge-primary {
-            background-color: rgba(52, 152, 219, 0.2);
-            color: var(--primary-color);
+            background-color: rgba(67, 97, 238, 0.1);
+            color: var(--primary);
         }
-        
+
+        .badge-success {
+            background-color: rgba(76, 201, 240, 0.1);
+            color: var(--success);
+        }
+
         .modal {
             display: none;
             position: fixed;
@@ -169,36 +250,93 @@
             z-index: 1000;
             justify-content: center;
             align-items: center;
+            animation: fadeIn 0.3s ease;
         }
-        
+
         .modal-content {
             background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            width: 80%;
+            padding: 25px;
+            border-radius: var(--rounded);
+            width: 90%;
             max-width: 600px;
             max-height: 80vh;
             overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
-        
+
         .close-modal {
             float: right;
             cursor: pointer;
             font-size: 1.5rem;
+            color: #666;
+            transition: var(--transition);
+        }
+
+        .close-modal:hover {
+            color: var(--danger);
+            transform: rotate(90deg);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                border-radius: 0;
+            }
+            
+            header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .tab-btn {
+                padding: 12px 15px;
+                font-size: 0.9rem;
+            }
+            
+            .form-control, .btn {
+                padding: 10px 15px;
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary);
+        }
+
+        /* Animaciones */
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
         }
     </style>
 </head>
 <body>
     <header>
-        <div class="container">
-            <h1>Sistema de Administración de Pacientes</h1>
-        </div>
+        <h1>Sistema de Administración de Pacientes</h1>
     </header>
     
     <div class="container">
         <div class="tabs">
             <button class="tab-btn active" data-tab="patients">Pacientes</button>
             <button class="tab-btn" data-tab="sessions">Sesiones</button>
+            <button class="tab-btn" data-tab="calendar">Calendario</button>
         </div>
         
         <!-- Pacientes Tab -->
@@ -262,7 +400,9 @@
                         </select>
                     </div>
                     
-                    <button type="submit" class="btn btn-success">Guardar Paciente</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="icon-save"></i> Guardar Paciente
+                    </button>
                 </form>
             </div>
             
@@ -314,10 +454,16 @@
                     
                     <div class="form-group">
                         <label>Tratamientos</label>
-                        <div>
-                            <label><input type="checkbox" id="magneto"> Magneto</label>
-                            <label><input type="checkbox" id="laser"> Láser</label>
-                            <label><input type="checkbox" id="massage"> Masaje</label>
+                        <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                            <label class="btn-secondary" style="margin: 0;">
+                                <input type="checkbox" id="magneto" style="margin-right: 5px;"> Magneto
+                            </label>
+                            <label class="btn-secondary" style="margin: 0;">
+                                <input type="checkbox" id="laser" style="margin-right: 5px;"> Láser
+                            </label>
+                            <label class="btn-secondary" style="margin: 0;">
+                                <input type="checkbox" id="massage" style="margin-right: 5px;"> Masaje
+                            </label>
                         </div>
                     </div>
                     
@@ -326,7 +472,9 @@
                         <input type="text" id="otherTreatment" class="form-control">
                     </div>
                     
-                    <button type="submit" class="btn btn-success">Programar Sesión</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="icon-calendar"></i> Programar Sesión
+                    </button>
                 </form>
             </div>
             
@@ -345,6 +493,19 @@
                         <!-- Las sesiones se cargarán aquí con JavaScript -->
                     </tbody>
                 </table>
+            </div>
+        </div>
+        
+        <!-- Calendario Tab -->
+        <div id="calendar" class="tab-content">
+            <div class="card">
+                <h2>Calendario de Sesiones</h2>
+                <div id="calendarView" style="min-height: 500px;">
+                    <!-- El calendario se cargará aquí con JavaScript -->
+                    <p style="text-align: center; padding: 50px; color: #666;">
+                        Vista de calendario (se implementará con una biblioteca como FullCalendar)
+                    </p>
+                </div>
             </div>
         </div>
     </div>
@@ -507,8 +668,8 @@
                         <td>${patientObj.getAge()}</td>
                         <td>${patientObj.diagnosis ? patientObj.diagnosis.substring(0, 30) + (patientObj.diagnosis.length > 30 ? '...' : '') : ''}</td>
                         <td>
-                            <button class="btn-view" data-id="${patientObj.id}">Ver</button>
-                            <button class="btn-delete" data-id="${patientObj.id}">Eliminar</button>
+                            <button class="btn btn-primary btn-view" data-id="${patientObj.id}" style="padding: 6px 12px; margin-right: 5px;">Ver</button>
+                            <button class="btn btn-danger btn-delete" data-id="${patientObj.id}" style="padding: 6px 12px;">Eliminar</button>
                         </td>
                     `;
                     
@@ -556,7 +717,7 @@
                 }
                 
                 // Ordenar sesiones por fecha (más recientes primero)
-                sessions.sort((a, b) => new Date(b.date) - new Date(a.date));
+                sessions.sort((a, b) => new Date(a.date) - new Date(b.date));
                 
                 sessions.forEach(session => {
                     const sessionObj = new Session(
@@ -577,9 +738,13 @@
                     tr.innerHTML = `
                         <td>${patientName}</td>
                         <td>${sessionObj.getFormattedDate()}</td>
-                        <td>${sessionObj.getTreatments().join(', ')}</td>
                         <td>
-                            <button class="btn-delete-session" data-id="${sessionObj.id}">Eliminar</button>
+                            <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                                ${sessionObj.getTreatments().map(t => `<span class="badge badge-primary">${t}</span>`).join('')}
+                            </div>
+                        </td>
+                        <td>
+                            <button class="btn btn-danger btn-delete-session" data-id="${sessionObj.id}" style="padding: 6px 12px;">Eliminar</button>
                         </td>
                     `;
                     
@@ -619,16 +784,52 @@
                 
                 document.getElementById('modalTitle').textContent = `Detalles de ${patient.getFullName()}`;
                 
+                const birthDate = new Date(patient.birthDate);
+                const formattedBirthDate = birthDate.toLocaleDateString('es-ES', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                
                 const content = `
-                    <p><strong>Nombre completo:</strong> ${patient.getFullName()}</p>
-                    <p><strong>Edad:</strong> ${patient.getAge()} años</p>
-                    <p><strong>Fecha de nacimiento:</strong> ${patient.birthDate}</p>
-                    <p><strong>Diagnóstico:</strong> ${patient.diagnosis || 'No especificado'}</p>
-                    <p><strong>Estado civil:</strong> ${patient.maritalStatus}</p>
-                    <p><strong>Hijos:</strong> ${patient.hasChildren ? 'Sí' : 'No'}</p>
-                    <p><strong>Deporte:</strong> ${patient.sport || 'No especificado'}</p>
-                    <p><strong>Hobbies:</strong> ${patient.hobbies || 'No especificados'}</p>
-                    <p><strong>Forma de pago:</strong> ${patient.paymentMethod}</p>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div>
+                            <p><strong>Nombre completo:</strong></p>
+                            <p>${patient.getFullName()}</p>
+                        </div>
+                        <div>
+                            <p><strong>Edad:</strong></p>
+                            <p>${patient.getAge()} años</p>
+                        </div>
+                        <div>
+                            <p><strong>Fecha de nacimiento:</strong></p>
+                            <p>${formattedBirthDate}</p>
+                        </div>
+                        <div>
+                            <p><strong>Estado civil:</strong></p>
+                            <p>${patient.maritalStatus}</p>
+                        </div>
+                        <div>
+                            <p><strong>Hijos:</strong></p>
+                            <p>${patient.hasChildren ? 'Sí' : 'No'}</p>
+                        </div>
+                        <div>
+                            <p><strong>Deporte:</strong></p>
+                            <p>${patient.sport || 'No especificado'}</p>
+                        </div>
+                        <div>
+                            <p><strong>Forma de pago:</strong></p>
+                            <p>${patient.paymentMethod}</p>
+                        </div>
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <p><strong>Diagnóstico:</strong></p>
+                        <p>${patient.diagnosis || 'No especificado'}</p>
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <p><strong>Hobbies:</strong></p>
+                        <p>${patient.hobbies || 'No especificados'}</p>
+                    </div>
                 `;
                 
                 document.getElementById('modalContent').innerHTML = content;
@@ -705,15 +906,20 @@
                     e.preventDefault();
                     
                     const id = StorageManager.getNextPatientId();
-                    const firstName = document.getElementById('firstName').value;
-                    const lastName = document.getElementById('lastName').value;
+                    const firstName = document.getElementById('firstName').value.trim();
+                    const lastName = document.getElementById('lastName').value.trim();
                     const birthDate = document.getElementById('birthDate').value;
-                    const diagnosis = document.getElementById('diagnosis').value;
+                    const diagnosis = document.getElementById('diagnosis').value.trim();
                     const maritalStatus = document.getElementById('maritalStatus').value;
                     const hasChildren = document.getElementById('hasChildren').checked;
-                    const sport = document.getElementById('sport').value;
-                    const hobbies = document.getElementById('hobbies').value;
+                    const sport = document.getElementById('sport').value.trim();
+                    const hobbies = document.getElementById('hobbies').value.trim();
                     const paymentMethod = document.getElementById('paymentMethod').value;
+                    
+                    if (!firstName || !lastName || !birthDate) {
+                        alert('Por favor complete los campos obligatorios');
+                        return;
+                    }
                     
                     const newPatient = new Patient(
                         id,
@@ -734,7 +940,27 @@
                     
                     this.reset();
                     UIManager.loadPatients();
-                    alert('Paciente registrado correctamente');
+                    
+                    // Mostrar notificación visual
+                    const notification = document.createElement('div');
+                    notification.style.position = 'fixed';
+                    notification.style.bottom = '20px';
+                    notification.style.right = '20px';
+                    notification.style.backgroundColor = 'var(--success)';
+                    notification.style.color = 'white';
+                    notification.style.padding = '15px 25px';
+                    notification.style.borderRadius = 'var(--rounded)';
+                    notification.style.boxShadow = 'var(--shadow)';
+                    notification.style.zIndex = '1000';
+                    notification.style.animation = 'fadeIn 0.3s ease';
+                    notification.textContent = 'Paciente registrado correctamente';
+                    
+                    document.body.appendChild(notification);
+                    
+                    setTimeout(() => {
+                        notification.style.animation = 'fadeIn 0.3s ease reverse';
+                        setTimeout(() => notification.remove(), 300);
+                    }, 3000);
                 });
                 
                 // Formulario de sesión
@@ -747,13 +973,18 @@
                         return;
                     }
                     
-                    const id = StorageManager.getNextSessionId();
                     const date = document.getElementById('sessionDate').value;
-                    const notes = document.getElementById('sessionNotes').value;
+                    if (!date) {
+                        alert('Seleccione una fecha y hora');
+                        return;
+                    }
+                    
+                    const id = StorageManager.getNextSessionId();
+                    const notes = document.getElementById('sessionNotes').value.trim();
                     const magneto = document.getElementById('magneto').checked;
                     const laser = document.getElementById('laser').checked;
                     const massage = document.getElementById('massage').checked;
-                    const otherTreatment = document.getElementById('otherTreatment').value;
+                    const otherTreatment = document.getElementById('otherTreatment').value.trim();
                     
                     const newSession = new Session(
                         id,
@@ -772,7 +1003,27 @@
                     
                     this.reset();
                     UIManager.loadSessions();
-                    alert('Sesión programada correctamente');
+                    
+                    // Mostrar notificación visual
+                    const notification = document.createElement('div');
+                    notification.style.position = 'fixed';
+                    notification.style.bottom = '20px';
+                    notification.style.right = '20px';
+                    notification.style.backgroundColor = 'var(--success)';
+                    notification.style.color = 'white';
+                    notification.style.padding = '15px 25px';
+                    notification.style.borderRadius = 'var(--rounded)';
+                    notification.style.boxShadow = 'var(--shadow)';
+                    notification.style.zIndex = '1000';
+                    notification.style.animation = 'fadeIn 0.3s ease';
+                    notification.textContent = 'Sesión programada correctamente';
+                    
+                    document.body.appendChild(notification);
+                    
+                    setTimeout(() => {
+                        notification.style.animation = 'fadeIn 0.3s ease reverse';
+                        setTimeout(() => notification.remove(), 300);
+                    }, 3000);
                 });
             }
         }
@@ -787,21 +1038,62 @@
             
             // Cargar datos de ejemplo si no hay datos
             if (StorageManager.getPatients().length === 0) {
-                const examplePatient = new Patient(
-                    1,
-                    'Juan',
-                    'Pérez',
-                    '1985-05-15',
-                    'Dolor lumbar crónico',
-                    'Casado',
-                    true,
-                    'Natación',
-                    'Leer, música',
-                    'Efectivo'
-                );
+                const examplePatients = [
+                    new Patient(
+                        1,
+                        'Juan',
+                        'Pérez',
+                        '1985-05-15',
+                        'Dolor lumbar crónico',
+                        'Casado',
+                        true,
+                        'Natación',
+                        'Leer, música',
+                        'Efectivo'
+                    ),
+                    new Patient(
+                        2,
+                        'María',
+                        'Gómez',
+                        '1990-11-22',
+                        'Lesión de rodilla derecha',
+                        'Soltero',
+                        false,
+                        'Ciclismo',
+                        'Pintura, cine',
+                        'Tarjeta'
+                    )
+                ];
                 
-                StorageManager.savePatients([examplePatient]);
+                StorageManager.savePatients(examplePatients);
                 UIManager.loadPatients();
+            }
+            
+            if (StorageManager.getSessions().length === 0) {
+                const exampleSessions = [
+                    new Session(
+                        1,
+                        1,
+                        new Date(Date.now() + 86400000).toISOString().slice(0, 16),
+                        'Primera sesión de evaluación',
+                        true,
+                        false,
+                        true,
+                        ''
+                    ),
+                    new Session(
+                        2,
+                        2,
+                        new Date(Date.now() + 2 * 86400000).toISOString().slice(0, 16),
+                        'Seguimiento semanal',
+                        false,
+                        true,
+                        false,
+                        'Electroterapia'
+                    )
+                ];
+                
+                StorageManager.saveSessions(exampleSessions);
             }
         });
     </script>
